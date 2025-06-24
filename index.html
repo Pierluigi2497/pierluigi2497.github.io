@@ -3,43 +3,95 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Web Terminal</title>
+<title>Web Terminal - Kitty Style</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap');
+
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #1e1e2e;
+    color: #a0f0a0;
+    font-family: 'Fira Mono', monospace;
+    font-size: 16px;
+    line-height: 1.4;
+    user-select: none;
+  }
   body {
-    background: #000;
-    color: #33ff33;
-    font-family: monospace;
-    margin: 0;
-    padding: 1em;
-    height: 100vh;
     display: flex;
     flex-direction: column;
+    height: 100vh;
+  }
+  #help {
+    padding: 12px 15px;
+    border-bottom: 1px solid #4b5578;
+    background: #2a2a3d;
+    white-space: pre-wrap;
+    color: #7fba7f;
+    font-weight: 500;
+    user-select: text;
   }
   #terminal {
     flex-grow: 1;
     overflow-y: auto;
+    padding: 15px;
     white-space: pre-wrap;
+    background: #1e1e2e;
+  }
+  #terminal div {
+    margin-bottom: 6px;
   }
   #input-line {
     display: flex;
     align-items: center;
+    padding: 12px 15px;
+    border-top: 1px solid #4b5578;
+    background: #2a2a3d;
   }
   #prompt {
     user-select: none;
+    color: #7fba7f;
+    font-weight: 600;
   }
   #cmdline {
     background: transparent;
     border: none;
-    color: #33ff33;
+    color: #a0f0a0;
     outline: none;
-    font-family: monospace;
+    font-family: 'Fira Mono', monospace;
     flex-grow: 1;
-    font-size: 1em;
+    font-size: 16px;
+    caret-color: #a0f0a0;
+    padding-left: 8px;
+  }
+  #cmdline:focus {
+    caret-color: #a0f0a0;
+    background-color: rgba(160, 240, 160, 0.1);
+    border-radius: 3px;
+  }
+  #terminal::-webkit-scrollbar {
+    width: 8px;
+  }
+  #terminal::-webkit-scrollbar-track {
+    background: #1e1e2e;
+  }
+  #terminal::-webkit-scrollbar-thumb {
+    background-color: #4b5578;
+    border-radius: 4px;
   }
 </style>
 </head>
 <body>
+
+<div id="help">Available commands:
+help       Show this message
+whoami     Show information about me
+clear      Clear the terminal
+echo [msg] Print your message
+date       Show current date and time
+</div>
+
 <div id="terminal"></div>
+
 <div id="input-line">
   <span id="prompt">$&nbsp;</span>
   <input type="text" id="cmdline" autofocus autocomplete="off" spellcheck="false" />
@@ -51,20 +103,25 @@
 
   const commands = {
     help: `Available commands:
-  help       Show this help message
-  about      Info about this page
-  clear      Clear the terminal
-  echo [msg] Prints the message
-  date       Shows the current date and time`,
-    
-    about: `This is a simple web terminal demo running on GitHub Pages.
-It uses only HTML, CSS, and JavaScript.`,
-    
-    date: () => new Date().toString(),
+help       Show this message
+whoami     Show information about me
+clear      Clear the terminal
+echo [msg] Print your message
+date       Show current date and time`,
+
+    whoami: `Hi, I'm Pierluigi Imperiale!
+I'm really into cyber security, especially red teaming and ethical hacking.
+I spend time every day training on platforms like TryHackMe and Hack The Box
+to keep improving my IT security skills.
+When I'm not hacking around, I enjoy making music and playing video games.`,
+
+    date: () => new Date().toLocaleString(),
   };
 
   function printOutput(text) {
-    terminal.innerText += text + '\n';
+    const line = document.createElement('div');
+    line.textContent = text;
+    terminal.appendChild(line);
     terminal.scrollTop = terminal.scrollHeight;
   }
 
@@ -75,7 +132,7 @@ It uses only HTML, CSS, and JavaScript.`,
     if (!cmd) return;
 
     if (cmd === 'clear') {
-      terminal.innerText = '';
+      terminal.innerHTML = '';
       return;
     }
 
@@ -88,7 +145,7 @@ It uses only HTML, CSS, and JavaScript.`,
       const output = typeof commands[cmd] === 'function' ? commands[cmd]() : commands[cmd];
       printOutput(output);
     } else {
-      printOutput(`Command not found: ${cmd}\nType 'help' for available commands.`);
+      printOutput(`Command not found: ${cmd}\nType 'help' to see available commands.`);
     }
   }
 
@@ -101,5 +158,7 @@ It uses only HTML, CSS, and JavaScript.`,
     }
   });
 </script>
+
 </body>
 </html>
+
