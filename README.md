@@ -1,96 +1,58 @@
-# Terminal Portfolio Website by Sat Naing
+## Web Terminal
 
-![Terminal Portfolio Website by Sat Naing](https://user-images.githubusercontent.com/53733092/194220661-e2ff8b4c-f64a-4b64-a836-c52fae6bbcda.png)
+This is a basic ubuntu based web terminal that serves as an interactive portfolio of mine.
+You are welcome to use it, I just ask for credit.
 
-![ts](https://badgen.net/badge/Built%20With/TypeScript/blue?style=flat-square)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/81fdb91d-c06f-46c2-b18d-dfc6f090f281/deploy-status)](https://app.netlify.com/sites/terminal-sn/deploys)
-![Gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square)
+If you would like a live version, visit my portfolio: https://yasfu.net/
 
-My perfolio website in terminal version developed with React, TypeScript and Styled-Components. Multiple themes supported and keyboard shortcuts can be used for some functionalities.
+It features a command system, as well as an "auto typer" that automatically types out and enters commands from code.
+This is useful for visitors that are not familiar with CLIs and broadens the amount of people who can navigate it.
+To increase this further, files listed with "ls" and other places can be clicked on to automatically execute commands like cat
 
-Blog Post: https://satnaing.dev/blog/posts/how-do-i-develop-my-terminal-portfolio-website-with-react
+## How-To setup
 
-## Demo
+If you'd like to configure it for your own needs, any file in the terminalfiles folder are automatically available for the terminal to use.
+By default the commands `cat welcome.txt` and `ls` are automatically ran when the terminal starts. You can change welcome.txt to change the welcome message or change the commands themselves in terminal.js, line 27:
 
-<a href="https://www.jinno.app/redirect?from=satnaing&redirect=libary&libName=terminal-portfolio&componentName=App&libCreator=satnaing" target="_blank" rel="noopener noreferrer">Demo - try it in your editor</a>
-
-## Features
-
-- Responsive Design 📱💻
-- Multiple themes 🎨
-- Autocomplete feature ✨ (TAB | Ctrl + i)
-- Go previous and next command ⬆️⬇️
-- View command history 📖
-- PWA and Offline Support 🔥
-- Well-tested ✅
-
-## Tech Stack
-
-**Frontend** - [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/)  
-**Styling** - [Styled-Components](https://styled-components.com/)  
-**UI/UX** - [Figma](https://figma.com/)  
-**State Management** - [ContextAPI](https://reactjs.org/docs/context.html)  
-**Testing** - [Vitest](https://vitest.dev/), [React Testing Library](https://testing-library.com/)  
-**Deployment** - [Netlify](https://app.netlify.com/)
-
-## Multiple Themes
-
-<a href="https://www.jinno.app/redirect?from=satnaing&redirect=libary&libName=terminal-portfolio&componentName=App&libCreator=satnaing" target="_blank" rel="noopener noreferrer">Demo - Dark theme</a><br/>
-<a href="https://www.jinno.app/redirect?from=satnaing&redirect=libary&libName=terminal-portfolio&componentName=AppLight&libCreator=satnaing" target="_blank" rel="noopener noreferrer">Demo - light theme</a><br/>
-<a href="https://www.jinno.app/redirect?from=satnaing&redirect=libary&libName=terminal-portfolio&componentName=AppBlue&libCreator=satnaing" target="_blank" rel="noopener noreferrer">Demo - blue-matrix theme</a><br/>
-<a href="https://www.jinno.app/redirect?from=satnaing&redirect=libary&libName=terminal-portfolio&componentName=AppEspresso&libCreator=satnaing" target="_blank" rel="noopener noreferrer">Demo - espresso theme</a><br/>
-<a href="https://www.jinno.app/redirect?from=satnaing&redirect=libary&libName=terminal-portfolio&componentName=AppGreen&libCreator=satnaing" target="_blank" rel="noopener noreferrer">Demo - green-goblin theme</a><br/>
-<a href="https://www.jinno.app/redirect?from=satnaing&redirect=libary&libName=terminal-portfolio&componentName=AppUbuntu&libCreator=satnaing" target="_blank" rel="noopener noreferrer">Demo - ubuntu theme</a><br/>
-
-Currently, this website supports 6 themes. Type `themes` in the terminal for more info.
-![terminal-portfolio-themes](https://user-images.githubusercontent.com/53733092/194221801-94f1c28b-4865-4b7f-a73e-d41132519bea.png)
-
-## Lighthouse Score
-
-<p align="center">
-<img width="710" alt="Sat Naing Terminal Lighthouse Score" src="public/lighthouse-result.svg">
-</p>
-
-## Running Locally
-
-Clone the project
-
-```bash
-git clone https://github.com/satnaing/terminal-portfolio.git
+```js
+autowriteQueue.push("Command here with arguments");
 ```
 
-Go to the project directory
+Pushing anything to the queue will type out the command while locking user input as soon as input is ready.
 
-```bash
-cd terminal-portfolio
+
+If you would like to add custom commands you may add it to any script included after terminal.js. I recommend making a new file and add any custom commands to that instead of defaultcommands.js to make any git merges a little easier.
+You can look at any command in defaultcommands.js for more examples or reference the example below:
+
+```js
+function myCommand(args) {
+  terminalPrint("Message here");
+  cmdDone(); // Required after finishing function. Useful for any asynchronous functions. (ie. AJAX)
+}
+
+function ready() {
+  addCmd("mycommand", myCommand);
+}
+
+$(document).ready(ready);
 ```
 
-Remove remote origin
+the first argument passed to any command function is a list of arguments given by the user. It is seperated by spaces but ignores quotes
+For example: `mycommand there are "some arguments" 'to pass'` would yield `there, are, some arguments, to pass`.
 
-```bash
-git remote remove origin
-```
+### Useful functions
 
-Install dependencies
+`terminalPrint` is a simple print function. The first argument is the message to print, and the second optional argument is a boolean that, if true, adds a line break to the end. By default this value is true.
 
-```bash
-npm install
-```
+`cmdDone` resets the user's input, and must be called after a command execute is finished. This is needed to support Asynchronous functions like AJAX.
 
-Start the server
+`toggleInput` disables or enables user input. `true` will block input and `false` will enable it. No argument will toggle it based on the current locked state.
 
-```bash
-npm run dev
-```
+`addCmd` adds the command to the terminal. The first argument is a string and is the keyword for the user to execute the command. The second is a function that is called with a table of arguments the user passed with the command
 
-## Inspiration and Credits
 
-Here are some inspiration for this kind of terminal website. Only some features and functionalities are inspired by these following websites. All codes are written on my own.
+## Contributing
 
-- I built this repository using [Jinno](https://www.jinno.app/redirect?from=satnaing&redirect=vs)
-- [term m4tt72](https://term.m4tt72.com/)
-- [Forrest](https://fkcodes.com/)
-
-## Author
-
-- [@satnaing](https://satnaing.dev)
+You're welcome to submit pull requests if you want to, just try and keep code style consistent with the rest of the file.
+Try to submit bug fixes instead of major feature changes. If you feel like a feature change may make a good contribution to the main software then you are welcome to do so, however there is no guarantee that it will be merged. Any new commands must be 'general' commands and can be widely applicable to be merged with the main branch. Something like `tail` or an existing linux/unix command.
+I have been using camelCase for the most part, and K&R style for bracket positioning.
