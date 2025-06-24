@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Web Terminal</title>
+<style>
+  body {
+    background: #000;
+    color: #33ff33;
+    font-family: monospace;
+    margin: 0;
+    padding: 1em;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  #terminal {
+    flex-grow: 1;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+  #input-line {
+    display: flex;
+    align-items: center;
+  }
+  #prompt {
+    user-select: none;
+  }
+  #cmdline {
+    background: transparent;
+    border: none;
+    color: #33ff33;
+    outline: none;
+    font-family: monospace;
+    flex-grow: 1;
+    font-size: 1em;
+  }
+</style>
+</head>
+<body>
+<div id="terminal"></div>
+<div id="input-line">
+  <span id="prompt">$&nbsp;</span>
+  <input type="text" id="cmdline" autofocus autocomplete="off" spellcheck="false" />
+</div>
+
+<script>
+  const terminal = document.getElementById('terminal');
+  const cmdline = document.getElementById('cmdline');
+
+  const commands = {
+    help: `Available commands:
+  help       Show this help message
+  about      Info about this page
+  clear      Clear the terminal
+  echo [msg] Prints the message
+  date       Shows the current date and time`,
+    
+    about: `This is a simple web terminal demo running on GitHub Pages.
+It uses only HTML, CSS, and JavaScript.`,
+    
+    date: () => new Date().toString(),
+  };
+
+  function printOutput(text) {
+    terminal.innerText += text + '\n';
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function processCommand(input) {
+    const args = input.trim().split(' ');
+    const cmd = args.shift().toLowerCase();
+
+    if (!cmd) return;
+
+    if (cmd === 'clear') {
+      terminal.innerText = '';
+      return;
+    }
+
+    if (cmd === 'echo') {
+      printOutput(args.join(' '));
+      return;
+    }
+
+    if (commands[cmd]) {
+      const output = typeof commands[cmd] === 'function' ? commands[cmd]() : commands[cmd];
+      printOutput(output);
+    } else {
+      printOutput(`Command not found: ${cmd}\nType 'help' for available commands.`);
+    }
+  }
+
+  cmdline.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const input = cmdline.value;
+      printOutput(`$ ${input}`);
+      processCommand(input);
+      cmdline.value = '';
+    }
+  });
+</script>
+</body>
+</html>
